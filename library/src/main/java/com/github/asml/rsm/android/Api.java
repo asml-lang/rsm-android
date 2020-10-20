@@ -54,11 +54,14 @@ class Api {
             @Override public void messageArrived(String topic, MqttMessage message) throws Exception {
                 Log.d(TAG, "messageArrived() called with: topic = [" + topic + "], message = [" + message + "]");
                 String[] topicParts = topic.split("/");
-                if (topicParts.length < 2) {
-                    // TODO: Handle this situation
-                }
+                Log.d(TAG, "messageArrived: Split:" + topicParts.length);
+
+                String deviceId = null;
                 String mainTopic = topicParts[0];
-                String deviceId = topicParts[1];
+                if (topicParts.length == 2) {
+                    deviceId = topicParts[1];
+                }
+
                 Log.d(TAG, "messageArrived: Topic: " + mainTopic);
                 if (mainTopic.equals("online")) {
                     onOnlineListener.onOnline(deviceId, message.toString().equals("true"));
@@ -102,7 +105,7 @@ class Api {
 
     public void publishDevice(Device device, Model model) {
         State<DeviceState> data = new State<>(new DeviceState(device, true));
-        this.subscribe(model.getName() + "/" + device.getId());
+        subscribe(model.getName() + "/" + device.getId());
         publish(model.getName(), data);
         subscribe(model.getName());
     }
